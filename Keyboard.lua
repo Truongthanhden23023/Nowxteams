@@ -1,49 +1,31 @@
--- Tạo GUI
+-- Create a TextBox and a button in the Roblox UI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.Players.LocalPlayer.PlayerGui
 
--- Tạo TextBox
 local textBox = Instance.new("TextBox")
 textBox.Size = UDim2.new(0, 200, 0, 50)
-textBox.Position = UDim2.new(0, 100, 0, 100)
-textBox.PlaceholderText = "Nhập gì đó..."
+textBox.Position = UDim2.new(0, 50, 0, 50)
+textBox.PlaceholderText = "Type something..."
 textBox.Parent = screenGui
 
--- Tạo nút để ẩn/hiện TextBox
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 100, 0, 50)
-toggleButton.Position = UDim2.new(0, 100, 0, 160)
-toggleButton.Text = "Ẩn/Hiện TextBox"
-toggleButton.Parent = screenGui
-
--- Tạo nút "Delete"
-local deleteButton = Instance.new("TextButton")
-deleteButton.Size = UDim2.new(0, 100, 0, 50)
-deleteButton.Position = UDim2.new(0, 220, 0, 160)
-deleteButton.Text = "Xóa"
-deleteButton.Parent = screenGui
-
--- Tạo nút "Enter"
 local enterButton = Instance.new("TextButton")
 enterButton.Size = UDim2.new(0, 100, 0, 50)
-enterButton.Position = UDim2.new(0, 340, 0, 160)  -- Điều chỉnh vị trí để nút không bị chồng lên nhau
+enterButton.Position = UDim2.new(0, 50, 0, 150)
 enterButton.Text = "Enter"
 enterButton.Parent = screenGui
 
--- Ẩn TextBox khi bắt đầu
-textBox.Visible = false
+-- Function to simulate Enter key press
+local function onEnterPressed()
+    print("Enter key pressed. Text entered:", textBox.Text)
+    textBox.Text = ""  -- Clear the text box after pressing Enter
+end
 
--- Chức năng ẩn/hiện TextBox
-toggleButton.MouseButton1Click:Connect(function()
-    textBox.Visible = not textBox.Visible
-end)
+-- Detect the Enter key press (for simulation)
+enterButton.MouseButton1Click:Connect(onEnterPressed)
 
--- Chức năng xóa nội dung TextBox
-deleteButton.MouseButton1Click:Connect(function()
-    textBox.Text = ""
-end)
-
--- Chức năng của nút Enter
-enterButton.MouseButton1Click:Connect(function()
-    print("Nội dung nhập vào là: " .. textBox.Text) -- Hiển thị nội dung nhập vào
+-- Optional: Detect keyboard Enter key press directly
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Return then
+        onEnterPressed()
+    end
 end)
