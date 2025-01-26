@@ -1,106 +1,88 @@
--- UIVisibilityToggle (LocalScript)
-
--- Đặt tên cho script trong mã (giúp quản lý script dễ dàng hơn)
-local scriptName = "NOW X TEAMS"  -- Tên script: UIVisibilityToggle
-
--- Lấy đối tượng Player
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
--- Tạo một ScreenGui để chứa các phần tử UI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = playerGui
-
--- Tạo một Frame để chứa các phần tử UI khác
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 200)  -- Kích thước của frame
-frame.Position = UDim2.new(0.5, -150, 0.5, -100)  -- Vị trí của frame (giữa màn hình)
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- Màu nền của frame
-frame.BackgroundTransparency = 0.5  -- Độ trong suốt của nền
-frame.Parent = screenGui
-
--- Tạo một TextLabel để hiển thị văn bản
-local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(0, 280, 0, 50)  -- Kích thước của TextLabel
-textLabel.Position = UDim2.new(0, 10, 0, 10)  -- Vị trí của TextLabel
-textLabel.Text = "Chào mừng đến với UI!"  -- Nội dung văn bản
-textLabel.TextSize = 24  -- Kích thước chữ
-textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Màu chữ
-textLabel.Parent = frame
-
--- Tạo một TextButton để bật/tắt UI
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 280, 0, 50)  -- Kích thước của nút
-toggleButton.Position = UDim2.new(0, 10, 0, 70)  -- Vị trí của nút
-toggleButton.Text = "Bật/Tắt UI"  -- Nội dung nút
-toggleButton.TextSize = 24  -- Kích thước chữ
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Màu chữ
-toggleButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)  -- Màu nền của nút
-toggleButton.Parent = frame
-
--- Biến trạng thái để bật/tắt UI
-local isUIVisible = true
-
--- Khi người chơi bấm vào nút, UI sẽ bật/tắt
-toggleButton.MouseButton1Click:Connect(function()
-    isUIVisible = not isUIVisible
-    screenGui.Visible = isUIVisible  -- Bật/tắt UI
-end)
-
--- Kiểm tra lỗi và phòng ngừa kick
-local function safeAction(player)
-    -- Kiểm tra nếu người chơi và nhân vật tồn tại
-    if not player or not player.Character then
-        warn(player.Name .. " không có nhân vật hoặc không kết nối đúng cách!")
-        return false
-    end
-
-    -- Kiểm tra nếu nhân vật có đối tượng "Humanoid"
-    local humanoid = player.Character:FindFirstChild("Humanoid")
-    if not humanoid then
-        warn(player.Name .. " không có Humanoid!")
-        return false
-    end
-
-    -- Kiểm tra quyền truy cập của người chơi (ví dụ: nhóm)
-    if not player:IsInGroup(1234567) then
-        warn(player.Name .. " không có quyền truy cập!")
-        return false
-    end
-
-    return true
+-- Rename Script Function
+local function renameScript(newName)
+    script.Name = newName
+    print("-----NOW X TEAMS Việt Nam------" .. newName)
 end
 
--- Phòng ngừa kick và lỗi bằng cách kiểm tra trước khi thay đổi giá trị
-local function changeHealth(player, health)
-    -- Kiểm tra nếu người chơi có quyền thay đổi sức khỏe
-    if safeAction(player) then
-        -- Giới hạn giá trị sức khỏe hợp lệ
-        if health < 0 or health > 100 then
-            warn("Sức khỏe không hợp lệ!")
-            return
+-- Example of renaming the script to 'NewScriptName'
+renameScript("NOW X TEAMS")
+
+-- Anti-Kick
+game:GetService("Players").PlayerAdded:Connect(function(player)
+    local function checkConnection()
+        if player.Status == Enum.PlayerStatus.Kicked then
+            player:Kick("You have been kicked due to an error.")
         end
-        player.Character.Humanoid.Health = health
     end
-end
-
--- Giới hạn tốc độ di chuyển hợp lệ (Phòng ngừa kick)
-local function setWalkSpeed(player, speed)
-    -- Kiểm tra nếu người chơi có quyền thay đổi tốc độ
-    if safeAction(player) then
-        -- Giới hạn tốc độ di chuyển hợp lệ
-        player.Character.Humanoid.WalkSpeed = math.clamp(speed, 0, 100)
-    end
-end
-
--- Ví dụ sử dụng: Thay đổi sức khỏe và tốc độ di chuyển
-game.Players.PlayerAdded:Connect(function(player)
-    -- Kiểm tra và thay đổi sức khỏe
-    changeHealth(player, 50)
-    
-    -- Thay đổi tốc độ di chuyển (giới hạn tốc độ hợp lệ)
-    setWalkSpeed(player, 50)
+    player.Changed:Connect(checkConnection)
 end)
 
--- Đặt tên script trong hệ thống (chỉ để ghi nhớ trong mã)
-print("Script name: NOW X TEAMS" .. scriptName)
+-- Anti-ErrorCode
+local function handleErrorCode()
+    -- Add specific error code handling here
+    local success, result = pcall(function()
+        -- Simulating some error-prone code here
+        error("Simulated error")
+    end)
+
+    if not success then
+        print("An error occurred: " .. result)
+        -- Handle the error accordingly
+    end
+end
+
+-- UI Toggle
+local toggleUI = false
+local function toggleUIVisibility()
+    if toggleUI then
+        -- Code to hide UI
+        print("UI hidden")
+    else
+        -- Code to show UI
+        print("UI visible")
+    end
+    toggleUI = not toggleUI
+end
+
+-- FPS Display
+local fpsLabel = Instance.new("TextLabel")
+fpsLabel.Size = UDim2.new(0, 200, 0, 50)
+fpsLabel.Position = UDim2.new(0, 10, 0, 10)
+fpsLabel.Text = "FPS: " .. tostring(workspace:GetService("RunService").Heartbeat:Wait())
+fpsLabel.Parent = game.Players.LocalPlayer.PlayerGui
+
+local function updateFPS()
+    local fps = math.floor(1 / workspace:GetService("RunService").Heartbeat:Wait())
+    fpsLabel.Text = "FPS: " .. fps
+end
+while true do
+    updateFPS()
+    wait(1)
+end
+
+-- Link Buttons
+local discordLink = Instance.new("TextButton")
+discordLink.Size = UDim2.new(0, 200, 0, 50)
+discordLink.Position = UDim2.new(0, 10, 0, 70)
+discordLink.Text = "Join Discord"
+discordLink.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/yYJdKyX6")
+end)
+discordLink.Parent = game.Players.LocalPlayer.PlayerGui
+
+local youtubeLink = Instance.new("TextButton")
+youtubeLink.Size = UDim2.new(0, 200, 0, 50)
+youtubeLink.Position = UDim2.new(0, 10, 0, 130)
+youtubeLink.Text = "Visit YouTube"
+youtubeLink.MouseButton1Click:Connect(function()
+    setclipboard("https://www.youtube.com/@Sito-v7l")
+end)
+youtubeLink.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- UI Toggle Handler
+local userInputService = game:GetService("UserInputService")
+userInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.T then
+        toggleUIVisibility()
+    end
+end)
