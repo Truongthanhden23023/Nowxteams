@@ -3,48 +3,70 @@ local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
+-- Hàm xử lý lỗi khi tạo UI và các đối tượng
+local function safeCreate(instanceType, parent, properties)
+    local success, instance = pcall(function()
+        local instance = Instance.new(instanceType)
+        for prop, value in pairs(properties) do
+            instance[prop] = value
+        end
+        if parent then
+            instance.Parent = parent
+        end
+        return instance
+    end)
+    if not success then
+        warn("Error creating instance: " .. tostring(instanceType))
+    end
+    return instance
+end
+
 -- Tạo một ScreenGui để chứa UI
-local screenGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-screenGui.Name = "NOW X TEAMS"
-screenGui.ResetOnSpawn = false
+local screenGui = safeCreate("ScreenGui", LocalPlayer.PlayerGui, {Name = "NOW X TEAMS", ResetOnSpawn = false})
 
 -- Tạo một Frame để làm nền cho decal
-local background = Instance.new("Frame", screenGui)
-background.Size = UDim2.new(1, 0, 1, 0)
-background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-background.BackgroundTransparency = 0.5
+local background = safeCreate("Frame", screenGui, {
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+    BackgroundTransparency = 0.5
+})
 
 -- Tạo một ImageLabel để hiển thị Decal
-local imageLabel = Instance.new("ImageLabel", background)
-imageLabel.Size = UDim2.new(0, 200, 0, 200)  -- Kích thước của decal
-imageLabel.Position = UDim2.new(0.5, -100, 0.5, -100)  -- Vị trí ở giữa màn hình
-imageLabel.BackgroundTransparency = 1  -- Không có background
-imageLabel.Image = "rbxassetid://124990866893793"  -- Thay ID này bằng ID decal của bạn
+local imageLabel = safeCreate("ImageLabel", background, {
+    Size = UDim2.new(0, 200, 0, 200),
+    Position = UDim2.new(0.5, -100, 0.5, -100),
+    BackgroundTransparency = 1,
+    Image = "rbxassetid://124990866893793"  -- Thay ID này bằng ID decal của bạn
+})
+
+-- Hiển thị UI
+screenGui.Parent = LocalPlayer.PlayerGui
 
 -- Tạo loading screen
 local function createLoadingScreen()
-    local loadingGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-    loadingGui.Name = "NOW X TEAMS"
-    loadingGui.ResetOnSpawn = false  -- Giữ UI khi respawn
+    local loadingGui = safeCreate("ScreenGui", LocalPlayer.PlayerGui, {Name = "LoadingScreen", ResetOnSpawn = false})
 
-    local loadingBackground = Instance.new("Frame", loadingGui)
-    loadingBackground.Size = UDim2.new(1, 0, 1, 0)
-    loadingBackground.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    loadingBackground.BackgroundTransparency = 0.5
+    local loadingBackground = safeCreate("Frame", loadingGui, {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+        BackgroundTransparency = 0.5
+    })
 
-    local loadingText = Instance.new("TextLabel", loadingBackground)
-    loadingText.Text = "Loading..."
-    loadingText.Size = UDim2.new(0, 200, 0, 50)
-    loadingText.Position = UDim2.new(0.5, -100, 0.5, -25)
-    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingText.TextSize = 30
-    loadingText.BackgroundTransparency = 1
+    local loadingText = safeCreate("TextLabel", loadingBackground, {
+        Text = "Loading...",
+        Size = UDim2.new(0, 200, 0, 50),
+        Position = UDim2.new(0.5, -100, 0.5, -25),
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 30,
+        BackgroundTransparency = 1
+    })
 
-    local spinner = Instance.new("ImageLabel", loadingBackground)
-    spinner.Size = UDim2.new(0, 50, 0, 50)
-    spinner.Position = UDim2.new(0.5, -25, 0.5, 25)
-    spinner.Image = "rbxassetid://301014156"  -- ID vòng quay mặc định
-    spinner.BackgroundTransparency = 1
+    local spinner = safeCreate("ImageLabel", loadingBackground, {
+        Size = UDim2.new(0, 50, 0, 50),
+        Position = UDim2.new(0.5, -25, 0.5, 25),
+        Image = "rbxassetid://124990866893793",  -- ID vòng quay mặc định
+        BackgroundTransparency = 1
+    })
 
     return loadingGui
 end
@@ -65,7 +87,9 @@ hideLoadingScreen()
 -- Anti AFK
 RunService.Heartbeat:Connect(function()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = 16 -- WalkSpeed bình thường
+        pcall(function()
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16 -- WalkSpeed bình thường
+        end)
     end
 end)
 
@@ -106,7 +130,20 @@ end
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed then
         if input.KeyCode == Enum.KeyCode.F then
-            fly() -- Chuyển trạng thái bay
+            pcall(fly) -- Bảo vệ việc gọi hàm fly
         end
     end
+end)
+
+-- Xử lý tất cả các lỗi không mong muốn
+local function safeExecute(func)
+    local success, errorMsg = pcall(func)
+    if not success then
+        warn("Error: " .. errorMsg)
+    end
+end
+
+-- Đảm bảo toàn bộ script chạy an toàn
+safeExecute(function()
+    -- Các đoạn mã quan trọng cần được bảo vệ bằng pcall ở đây
 end)
