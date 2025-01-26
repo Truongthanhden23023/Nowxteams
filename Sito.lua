@@ -1,21 +1,38 @@
--- Anti AFK, Anti Kick, Fly và Di chuyển UI (Như trước đây)
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
--- Loading Screen UI
+-- Tạo một ScreenGui để chứa UI
+local screenGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+screenGui.Name = "NOW X TEAMS"
+screenGui.ResetOnSpawn = false
+
+-- Tạo một Frame để làm nền cho decal
+local background = Instance.new("Frame", screenGui)
+background.Size = UDim2.new(1, 0, 1, 0)
+background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+background.BackgroundTransparency = 0.5
+
+-- Tạo một ImageLabel để hiển thị Decal
+local imageLabel = Instance.new("ImageLabel", background)
+imageLabel.Size = UDim2.new(0, 200, 0, 200)  -- Kích thước của decal
+imageLabel.Position = UDim2.new(0.5, -100, 0.5, -100)  -- Vị trí ở giữa màn hình
+imageLabel.BackgroundTransparency = 1  -- Không có background
+imageLabel.Image = "rbxassetid://124990866893793"  -- Thay ID này bằng ID decal của bạn
+
+-- Tạo loading screen
 local function createLoadingScreen()
     local loadingGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
     loadingGui.Name = "LoadingScreen"
     loadingGui.ResetOnSpawn = false  -- Giữ UI khi respawn
 
-    local background = Instance.new("Frame", loadingGui)
-    background.Size = UDim2.new(1, 0, 1, 0)
-    background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    background.BackgroundTransparency = 0.5
+    local loadingBackground = Instance.new("Frame", loadingGui)
+    loadingBackground.Size = UDim2.new(1, 0, 1, 0)
+    loadingBackground.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    loadingBackground.BackgroundTransparency = 0.5
 
-    local loadingText = Instance.new("TextLabel", background)
+    local loadingText = Instance.new("TextLabel", loadingBackground)
     loadingText.Text = "Loading..."
     loadingText.Size = UDim2.new(0, 200, 0, 50)
     loadingText.Position = UDim2.new(0.5, -100, 0.5, -25)
@@ -23,10 +40,10 @@ local function createLoadingScreen()
     loadingText.TextSize = 30
     loadingText.BackgroundTransparency = 1
 
-    local spinner = Instance.new("ImageLabel", background)
+    local spinner = Instance.new("ImageLabel", loadingBackground)
     spinner.Size = UDim2.new(0, 50, 0, 50)
     spinner.Position = UDim2.new(0.5, -25, 0.5, 25)
-    spinner.Image = "rbxassetid://124990866893793" -- Đây là vòng quay mặc định
+    spinner.Image = "rbxassetid://301014156"  -- ID vòng quay mặc định
     spinner.BackgroundTransparency = 1
 
     return loadingGui
@@ -34,21 +51,19 @@ end
 
 -- Hiển thị loading screen
 local loadingScreen = createLoadingScreen()
+
 local function hideLoadingScreen()
     if loadingScreen then
         loadingScreen:Destroy()  -- Ẩn loading screen sau khi hoàn thành
     end
 end
 
--- Hiển thị loading screen khi game bắt đầu hoặc khi cần
-loadingScreen.Enabled = true
-
 -- Giả sử đây là một tác vụ đang chạy, sau khi hoàn thành ta sẽ ẩn loading screen
 wait(5)  -- Giả sử mất 5 giây để thực hiện một tác vụ
 hideLoadingScreen()
 
 -- Anti AFK
-game:GetService("RunService").Heartbeat:Connect(function()
+RunService.Heartbeat:Connect(function()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = 16 -- WalkSpeed bình thường
     end
@@ -97,10 +112,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 -- Di chuyển UI tùy ý
-local gui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-gui.Name = "MovableUI"
-
-local frame = Instance.new("Frame", gui)
+local frame = Instance.new("Frame", screenGui)
 frame.Size = UDim2.new(0, 200, 0, 100)
 frame.Position = UDim2.new(0.5, -100, 0.5, -50)
 frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
