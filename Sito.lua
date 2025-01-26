@@ -1,124 +1,96 @@
--- Kết nối dịch vụ cần thiết
-local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local ui = script.Parent -- Giả sử UI nằm trong phần tử script
-local cooldownTime = 5 -- Thời gian cooldown (giây)
-local lastActionTime = 0 -- Thời gian thực hiện hành động lần cuối
-local buttons = {} -- Danh sách chứa tất cả các nút
-local keyButtons = {} -- Danh sách các phím ảo nhỏ PC
+local Player = game.Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
 
--- Tạo một nút ảo cho mỗi chữ cái từ A-Z và phím cách
-local function createKeyButton(key, position, size)
-    local keyButton = Instance.new("TextButton")
-    keyButton.Size = UDim2.new(0, size.X, 0, size.Y)
-    keyButton.Position = UDim2.new(0, position.X, 0, position.Y)
-    keyButton.Text = key
-    keyButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-    keyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    keyButton.Parent = game.Players.LocalPlayer.PlayerGui -- Thêm nút vào UI của người chơi
+-- Tạo UI chính
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
-    -- Gán sự kiện chạm vào nút
-    keyButton.MouseButton1Click:Connect(function()
-        print(key .. " key pressed!")
-    end)
+-- Tạo Frame chứa các nút và các label
+local UIFrame = Instance.new("Frame")
+UIFrame.Size = UDim2.new(0, 400, 0, 200)
+UIFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
+UIFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+UIFrame.Visible = false
+UIFrame.Parent = ScreenGui
 
-    return keyButton
-end
+-- Tạo label cho Anti Kick
+local AntiKickLabel = Instance.new("TextLabel")
+AntiKickLabel.Text = "Anti Kick: On"
+AntiKickLabel.Size = UDim2.new(0, 280, 0, 50)
+AntiKickLabel.Position = UDim2.new(0, 10, 0, 10)
+AntiKickLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+AntiKickLabel.BackgroundTransparency = 1
+AntiKickLabel.Parent = UIFrame
 
--- Tạo các phím ảo nhỏ (A-Z và phím Space) cho PC
-local function createSmallKeyButtons()
-    local startPosX = 20
-    local startPosY = 200
-    local spacing = 30 -- Khoảng cách giữa các phím ảo nhỏ
-    local keySize = Vector2.new(30, 30) -- Kích thước nhỏ của mỗi phím ảo
+-- Tạo label cho Anti Error Code
+local AntiErrorLabel = Instance.new("TextLabel")
+AntiErrorLabel.Text = "Anti Error Code: On"
+AntiErrorLabel.Size = UDim2.new(0, 280, 0, 50)
+AntiErrorLabel.Position = UDim2.new(0, 10, 0, 60)
+AntiErrorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+AntiErrorLabel.BackgroundTransparency = 1
+AntiErrorLabel.Parent = UIFrame
 
-    -- Tạo các nút chữ cái từ A đến Z
-    local position = Vector2.new(startPosX, startPosY)
-    for i = 1, 26 do
-        local key = string.char(64 + i)  -- Lấy ký tự từ A đến Z
-        local button = createKeyButton(key, position, keySize)
-        table.insert(keyButtons, button)
-
-        -- Cập nhật vị trí cho nút tiếp theo
-        if i % 10 == 0 then
-            position = Vector2.new(startPosX, position.Y + spacing) -- Dịch xuống dòng sau 10 phím
-        else
-            position = Vector2.new(position.X + spacing, position.Y) -- Dịch sang phải
-        end
-    end
-
-    -- Tạo phím cách (space)
-    local spaceButton = createKeyButton("Space", Vector2.new(startPosX, position.Y + spacing), keySize)
-    table.insert(keyButtons, spaceButton)
-end
-
--- Tạo nút ảo hiển thị UI
-local function createToggleButton()
-    local toggleButton = Instance.new("TextButton")
-    toggleButton.Size = UDim2.new(0, 100, 0, 50)
-    toggleButton.Position = UDim2.new(0, 20, 0, 20)
-    toggleButton.Text = "Toggle UI"
-    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.Parent = game.Players.LocalPlayer.PlayerGui -- Thêm nút vào UI của người chơi
-
-    -- Gán sự kiện chạm vào nút
-    toggleButton.MouseButton1Click:Connect(function()
-        ui.Enabled = not ui.Enabled
-    end)
-end
-
--- Hàm bắt sự kiện phím F cho PC và phím B cho điện thoại
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent then return end
-
-    if input.KeyCode == Enum.KeyCode.F then -- Phím F để toggle UI
-        ui.Enabled = not ui.Enabled
+-- Tạo nút tắt/bật Anti Kick
+local ToggleAntiKick = Instance.new("TextButton")
+ToggleAntiKick.Size = UDim2.new(0, 150, 0, 50)
+ToggleAntiKick.Position = UDim2.new(0, 10, 0, 110)
+ToggleAntiKick.Text = "Toggle Anti Kick"
+ToggleAntiKick.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ToggleAntiKick.Parent = UIFrame
+ToggleAntiKick.MouseButton1Click:Connect(function()
+    if AntiKickLabel.Text == "Anti Kick: On" then
+        AntiKickLabel.Text = "Anti Kick: Off"
+    else
+        AntiKickLabel.Text = "Anti Kick: On"
     end
 end)
 
--- Anti AFK (Giữ người chơi hoạt động)
-local function antiAFK()
-    local afkTimer = 0
-    game:GetService("RunService").Heartbeat:Connect(function()
-        afkTimer = afkTimer + 1
-        if afkTimer >= 30 then
-            -- Tạo hành động để tránh AFK, như di chuyển nhẹ hoặc nhấn phím
-            game:GetService("VirtualUser"):CaptureController()
-            game:GetService("VirtualUser"):ClickButton1(Vector2.new(0, 0)) -- Giả lập click
-            afkTimer = 0
+-- Tạo nút tắt/bật Anti Error Code
+local ToggleAntiError = Instance.new("TextButton")
+ToggleAntiError.Size = UDim2.new(0, 150, 0, 50)
+ToggleAntiError.Position = UDim2.new(0, 170, 0, 110)
+ToggleAntiError.Text = "Toggle Anti Error"
+ToggleAntiError.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ToggleAntiError.Parent = UIFrame
+ToggleAntiError.MouseButton1Click:Connect(function()
+    if AntiErrorLabel.Text == "Anti Error Code: On" then
+        AntiErrorLabel.Text = "Anti Error Code: Off"
+    else
+        AntiErrorLabel.Text = "Anti Error Code: On"
+    end
+end)
+
+-- Tạo Loading Spinner
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Size = UDim2.new(0, 100, 0, 100)
+LoadingFrame.Position = UDim2.new(0.5, -50, 0.5, -50)
+LoadingFrame.BackgroundTransparency = 1
+LoadingFrame.Visible = false
+LoadingFrame.Parent = ScreenGui
+
+local Spinner = Instance.new("ImageLabel")
+Spinner.Size = UDim2.new(0, 50, 0, 50)
+Spinner.Position = UDim2.new(0.5, -25, 0.5, -25)
+Spinner.Image = "rbxassetid://124990866893793"  -- ID của hình ảnh Spinner
+Spinner.BackgroundTransparency = 1
+Spinner.Parent = LoadingFrame
+
+-- Thêm hiệu ứng quay cho Spinner
+local TweenService = game:GetService("TweenService")
+local rotationTween = TweenService:Create(Spinner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), {Rotation = 360})
+rotationTween:Play()
+
+-- Hiển thị và tắt UI khi nhấn phím F
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed then
+        if input.KeyCode == Enum.KeyCode.F then
+            -- Hiển thị Loading trước khi hiển thị UI
+            LoadingFrame.Visible = true
+            UIFrame.Visible = false
+            wait(2)  -- Giả lập thời gian tải
+            LoadingFrame.Visible = false
+            UIFrame.Visible = true
         end
-    end)
-end
-
--- Anti Kick (Chống bị kick ra ngoài)
-local function antiKick()
-    game:GetService("Players").LocalPlayer.Idled:Connect(function()
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton1(Vector2.new(0, 0)) -- Giả lập click để tránh kick
-    end)
-end
-
--- Auto-Click và Auto-Jump với cooldown
-local function autoActions()
-    local lastClickTime = 0
-    game:GetService("RunService").Heartbeat:Connect(function()
-        if tick() - lastClickTime > cooldownTime then
-            -- Thực hiện auto click
-            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Click!", "All")
-            lastClickTime = tick()
-        end
-    end)
-end
-
--- Tạo nút ảo cho các phím A-Z và phím Space
-createSmallKeyButtons()
-
--- Tạo nút ảo hiển thị UI
-createToggleButton()
-
--- Gọi các chức năng Anti-AFK, Anti-Kick và Auto-Click
-antiAFK()
-antiKick()
-autoActions()
+    end
+end)
