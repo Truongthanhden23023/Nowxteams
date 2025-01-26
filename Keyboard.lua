@@ -26,7 +26,7 @@ deleteButton.Parent = screenGui
 -- Tạo nút "Enter"
 local enterButton = Instance.new("TextButton")
 enterButton.Size = UDim2.new(0, 100, 0, 50)
-enterButton.Position = UDim2.new(0, 340, 0, 160)
+enterButton.Position = UDim2.new(0, 340, 0, 160)  -- Điều chỉnh vị trí để nút không bị chồng lên nhau
 enterButton.Text = "Enter"
 enterButton.Parent = screenGui
 
@@ -45,5 +45,5 @@ end)
 
 -- Chức năng của nút Enter
 enterButton.MouseButton1Click:Connect(function()
-    print("Nội dung nhập vào là: " .. textBox.Text) -- Ví dụ: Hiển thị nội dung nhập vào
+    print("Nội dung nhập vào là: " .. textBox.Text) -- Hiển thị nội dung nhập vào
 end)
