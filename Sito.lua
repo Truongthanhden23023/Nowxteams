@@ -24,7 +24,7 @@ imageLabel.Image = "rbxassetid://124990866893793"  -- Thay ID này bằng ID dec
 -- Tạo loading screen
 local function createLoadingScreen()
     local loadingGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-    loadingGui.Name = "LoadingScreen"
+    loadingGui.Name = "NOW X TEAMS"
     loadingGui.ResetOnSpawn = false  -- Giữ UI khi respawn
 
     local loadingBackground = Instance.new("Frame", loadingGui)
