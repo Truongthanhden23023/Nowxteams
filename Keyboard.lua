@@ -23,6 +23,13 @@ deleteButton.Position = UDim2.new(0, 220, 0, 160)
 deleteButton.Text = "Xóa"
 deleteButton.Parent = screenGui
 
+-- Tạo nút "Enter"
+local enterButton = Instance.new("TextButton")
+enterButton.Size = UDim2.new(0, 100, 0, 50)
+enterButton.Position = UDim2.new(0, 340, 0, 160)
+enterButton.Text = "Enter"
+enterButton.Parent = screenGui
+
 -- Ẩn TextBox khi bắt đầu
 textBox.Visible = false
 
@@ -34,4 +41,9 @@ end)
 -- Chức năng xóa nội dung TextBox
 deleteButton.MouseButton1Click:Connect(function()
     textBox.Text = ""
+end)
+
+-- Chức năng của nút Enter
+enterButton.MouseButton1Click:Connect(function()
+    print("Nội dung nhập vào là: " .. textBox.Text) -- Ví dụ: Hiển thị nội dung nhập vào
 end)
