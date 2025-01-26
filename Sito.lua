@@ -44,7 +44,7 @@ screenGui.Parent = LocalPlayer.PlayerGui
 
 -- Tạo loading screen
 local function createLoadingScreen()
-    local loadingGui = safeCreate("ScreenGui", LocalPlayer.PlayerGui, {Name = "LoadingScreen", ResetOnSpawn = false})
+    local loadingGui = safeCreate("ScreenGui", LocalPlayer.PlayerGui, {Name = "NOW X TEAMS", ResetOnSpawn = false})
 
     local loadingBackground = safeCreate("Frame", loadingGui, {
         Size = UDim2.new(1, 0, 1, 0),
